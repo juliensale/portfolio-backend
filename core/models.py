@@ -1,10 +1,22 @@
 from django.db import models
 
 
+class Technology(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
 class Skill(models.Model):
     name = models.JSONField()
     description = models.JSONField()
     date = models.JSONField()
+    technology = models.ForeignKey(
+        Technology,
+        on_delete=models.CASCADE,
+        null=True
+    )
 
     def __str__(self):
         return self.name['en']
@@ -61,10 +73,3 @@ class Skill(models.Model):
                 raise ValueError('Year must be in [2000, 2100]')
 
         super(Skill, self).save(*args, **kwargs)
-
-
-class Technology(models.Model):
-    name = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name
