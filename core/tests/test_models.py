@@ -51,6 +51,27 @@ class SkillModelTest(TestCase):
                 date=[6, 2021]
             )
 
+    def test_name_strings(self):
+        """Test that name.en & name.fr must be strings"""
+        with self.assertRaises(ValueError):
+            models.Skill.objects.create(
+                name={"en": 3, "fr": "test"},
+                description={
+                    "en": "I learned to use MDX",
+                    "fr": "J'ai appris à utiliser MDX"
+                },
+                date=[6, 2021]
+            )
+        with self.assertRaises(ValueError):
+            models.Skill.objects.create(
+                name={"en": "test", "fr": [1, 2]},
+                description={
+                    "en": "I learned to use MDX",
+                    "fr": "J'ai appris à utiliser MDX"
+                },
+                date=[6, 2021]
+            )
+
     def test_name_extra_field(self):
         """Test that fails if extra field other than 'fr' or 'en'"""
         with self.assertRaises(ValueError):
@@ -91,6 +112,27 @@ class SkillModelTest(TestCase):
                 name={"en": "test", "fr": "test"},
                 description={
                     "en": "J'ai appris à utiliser MDX"
+                },
+                date=[6, 2021]
+            )
+
+    def test_description_strings(self):
+        """Test that description.en & description.fr must be strings"""
+        with self.assertRaises(ValueError):
+            models.Skill.objects.create(
+                name={"en": "test", "fr": "test"},
+                description={
+                    "en": 3,
+                    "fr": "J'ai appris à utiliser MDX"
+                },
+                date=[6, 2021]
+            )
+        with self.assertRaises(ValueError):
+            models.Skill.objects.create(
+                name={"en": "test", "fr": "test"},
+                description={
+                    "en": "I learned to use MDX",
+                    "fr": [1, 2, 3]
                 },
                 date=[6, 2021]
             )
@@ -172,6 +214,27 @@ class SkillModelTest(TestCase):
                     "fr": "J'ai appris à utiliser MDX",
                 },
                 date=[1, 2101]
+            )
+
+    def test_date_ints(self):
+        """Test that date values must be int"""
+        with self.assertRaises(ValueError):
+            models.Skill.objects.create(
+                name={"en": "test", "fr": "test"},
+                description={
+                    "en": "test",
+                    "fr": "J'ai appris à utiliser MDX"
+                },
+                date=["a", 2021]
+            )
+        with self.assertRaises(ValueError):
+            models.Skill.objects.create(
+                name={"en": "test", "fr": "test"},
+                description={
+                    "en": "I learned to use MDX",
+                    "fr": "test"
+                },
+                date=[6, [1, 2, 3]]
             )
 
     def test_skill_str(self):
