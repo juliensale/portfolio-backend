@@ -239,3 +239,14 @@ class SkillModelTest(TestCase):
 
     def test_skill_str(self):
         self.assertEqual(str(self.skill), self.skill.name['en'])
+
+
+class TechnologyModelTests(TestCase):
+
+    def setUp(self):
+        self.technology = models.Technology.objects.create(
+            name="Test"
+        )
+
+    def test_technology_str(self):
+        self.assertEqual(str(self.technology), self.technology.name)
