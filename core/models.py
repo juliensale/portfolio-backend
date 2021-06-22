@@ -35,4 +35,14 @@ class Skill(models.Model):
         except TypeError:
             raise ValueError(error_description)
 
+        if not isinstance(self.date, list):
+            raise ValueError('Skill date must be a list.')
+        elif len(self.date) != 2:
+            raise ValueError('Skill date must be of length 2')
+        else:
+            if self.date[0] < 1 or self.date[0] > 12:
+                raise ValueError('Month must be in [1, 12].')
+            if self.date[1] < 2000 or self.date[1] > 2100:
+                raise ValueError('Year must be in [2000, 2100]')
+
         super(Skill, self).save(*args, **kwargs)

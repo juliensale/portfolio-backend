@@ -108,5 +108,71 @@ class SkillModelTest(TestCase):
                 date=[6, 2021]
             )
 
+    def test_date_array(self):
+        """Test that fails if date not array"""
+        with self.assertRaises(ValueError):
+            models.Skill.objects.create(
+                name={"en": "test", "fr": "test"},
+                description={
+                    "en": "I learned to use MDX",
+                    "fr": "J'ai appris à utiliser MDX",
+                },
+                date={"a": "test"}
+            )
+
+    def test_date_array_length(self):
+        """Test that fails if date not of length 2"""
+        with self.assertRaises(ValueError):
+            models.Skill.objects.create(
+                name={"en": "test", "fr": "test"},
+                description={
+                    "en": "I learned to use MDX",
+                    "fr": "J'ai appris à utiliser MDX",
+                },
+                date=[1, 2, 3]
+            )
+
+    def test_date_month(self):
+        """Test that fails with month outside of [1,12]"""
+        with self.assertRaises(ValueError):
+            models.Skill.objects.create(
+                name={"en": "test", "fr": "test"},
+                description={
+                    "en": "I learned to use MDX",
+                    "fr": "J'ai appris à utiliser MDX",
+                },
+                date=[0, 2021]
+            )
+        with self.assertRaises(ValueError):
+            models.Skill.objects.create(
+                name={"en": "test", "fr": "test"},
+                description={
+                    "en": "I learned to use MDX",
+                    "fr": "J'ai appris à utiliser MDX",
+                },
+                date=[13, 2021]
+            )
+
+    def test_date_year(self):
+        """Test that fails with year outside of [2000,2100]"""
+        with self.assertRaises(ValueError):
+            models.Skill.objects.create(
+                name={"en": "test", "fr": "test"},
+                description={
+                    "en": "I learned to use MDX",
+                    "fr": "J'ai appris à utiliser MDX",
+                },
+                date=[1, 1999]
+            )
+        with self.assertRaises(ValueError):
+            models.Skill.objects.create(
+                name={"en": "test", "fr": "test"},
+                description={
+                    "en": "I learned to use MDX",
+                    "fr": "J'ai appris à utiliser MDX",
+                },
+                date=[1, 2101]
+            )
+
     def test_skill_str(self):
         self.assertEqual(str(self.skill), self.skill.name['en'])
