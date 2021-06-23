@@ -1,8 +1,22 @@
+import uuid
+import os
 from django.db import models
+
+
+def technology_file_path(instance, file_name):
+    """Generate file path for new technology image"""
+    ext = file_name.split('.')[-1]
+    file_name = f'{uuid.uuid4()}.{ext}'
+    return os.path.join('uploads/technology/', file_name)
 
 
 class Technology(models.Model):
     name = models.CharField(max_length=50)
+    image = models.ImageField(
+        upload_to=technology_file_path,
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return self.name

@@ -1,5 +1,6 @@
 from django.test import TestCase
 from core import models
+from unittest.mock import patch
 
 
 class SkillModelTest(TestCase):
@@ -247,6 +248,16 @@ class TechnologyModelTests(TestCase):
         self.technology = models.Technology.objects.create(
             name="Test"
         )
+
+    @patch('uuid.uuid4')
+    def test_image_file_name_uuid(self, mock_uuid):
+        """Test that imge is saved in the correct location"""
+        uuid = 'test-uuid'
+        mock_uuid.return_value = uuid
+        file_path = models.technology_file_path(None, 'myimage.jpg')
+
+        exp_path = f'uploads/technology/{uuid}.jpg'
+        self.assertEqual(file_path, exp_path)
 
     def test_technology_str(self):
         self.assertEqual(str(self.technology), self.technology.name)
