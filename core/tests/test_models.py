@@ -313,5 +313,14 @@ class ReviewModelTests(TestCase):
                 message={"en": "Test message", "fr": [1, 2, 3]}
             )
 
+    def test_update_code_generation(self):
+        """Test that update_code is generated when
+        and only when the object is created"""
+        code = self.review.update_code
+        self.review.author = "Test author 2"
+        self.review.save()
+        self.review.refresh_from_db()
+        self.assertEqual(code, self.review.update_code)
+
     def test_review_str(self):
         self.assertEqual(str(self.review), self.review.message['en'])

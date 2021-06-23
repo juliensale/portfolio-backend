@@ -97,6 +97,7 @@ class Skill(models.Model):
 class Review(models.Model):
     author = models.CharField(max_length=50)
     message = models.JSONField()
+    update_code = models.CharField(max_length=50, blank=True)
 
     def __str__(self):
         return self.message['en']
@@ -119,3 +120,7 @@ class Review(models.Model):
             raise ValueError(error_message)
         except TypeError:
             raise ValueError(error_message)
+
+        if self.pk is None:
+            self.update_code = str(uuid.uuid4())
+        super(Review, self).save(*args, **kwargs)
