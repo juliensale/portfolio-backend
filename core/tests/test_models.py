@@ -322,5 +322,13 @@ class ReviewModelTests(TestCase):
         self.review.refresh_from_db()
         self.assertEqual(code, self.review.update_code)
 
+    def test_modified(self):
+        """Test that the modified field doesn't change on creation"""
+        self.assertFalse(self.review.modified)
+        self.review.author = "Test author 2"
+        self.review.save()
+        self.review.refresh_from_db()
+        self.assertTrue(self.review.modified)
+
     def test_review_str(self):
         self.assertEqual(str(self.review), self.review.message['en'])
