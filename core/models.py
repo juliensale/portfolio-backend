@@ -92,3 +92,30 @@ class Skill(models.Model):
                 raise ValueError('Year must be in [2000, 2100]')
 
         super(Skill, self).save(*args, **kwargs)
+
+
+class Review(models.Model):
+    author = models.CharField(max_length=50)
+    message = models.JSONField()
+
+    def __str__(self):
+        return self.message['en']
+
+    def save(self, *args, **kwargs):
+        error_message = ("Fail")
+        try:
+            if self.message['en'] and self.message['fr']:
+                if len(self.message) != 2:
+                    raise ValueError(error_message + " Found an extra field.")
+                else:
+                    if (not isinstance(self.message['en'], str)
+                            or not isinstance(self.message['fr'], str)):
+                        raise ValueError(
+                            "'en' and 'fr' keys must be of type str."
+                        )
+            else:
+                raise ValueError(error_message)
+        except KeyError:
+            raise ValueError(error_message)
+        except TypeError:
+            raise ValueError(error_message)
