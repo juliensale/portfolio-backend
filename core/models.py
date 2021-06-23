@@ -37,13 +37,15 @@ class Skill(models.Model):
 
     def save(self, *args, **kwargs):
         # Name field
-        error_name = 'Skill object name must be an object with only the "en" and "fr" keys.'
+        error_name = ('Skill object name must be an'
+                      + ' object with only the "en" and "fr" keys.')
         try:
             if self.name['en'] and self.name['fr']:
                 if len(self.name) != 2:
                     raise ValueError(error_name + " Found an extra field.")
                 else:
-                    if not isinstance(self.name['en'], str) or not isinstance(self.name['fr'], str):
+                    if (not isinstance(self.name['en'], str)
+                            or not isinstance(self.name['fr'], str)):
                         raise ValueError(
                             "'en' and 'fr' keys must be of type str."
                         )
@@ -55,14 +57,16 @@ class Skill(models.Model):
             raise ValueError(error_name)
 
         # Description field
-        error_description = 'Skill object description must be an object with only the "en" and "fr" keys.'
+        error_description = ('Skill object description must be an'
+                             + ' object with only the "en" and "fr" keys.')
         try:
             if self.description['en'] and self.description['fr']:
                 if len(self.description) != 2:
                     raise ValueError(error_description +
                                      " Found an extra field.")
                 else:
-                    if not isinstance(self.description['en'], str) or not isinstance(self.description['fr'], str):
+                    if (not isinstance(self.description['en'], str)
+                            or not isinstance(self.description['fr'], str)):
                         raise ValueError(
                             "'en' and 'fr' keys must be of type str."
                         )
@@ -78,7 +82,8 @@ class Skill(models.Model):
             raise ValueError('Skill date must be a list.')
         elif len(self.date) != 2:
             raise ValueError('Skill date must be of length 2')
-        elif not isinstance(self.date[0], int) or not isinstance(self.date[1], int):
+        elif (not isinstance(self.date[0], int)
+              or not isinstance(self.date[1], int)):
             raise ValueError('Month and year must be integers.')
         else:
             if self.date[0] < 1 or self.date[0] > 12:
