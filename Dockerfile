@@ -9,7 +9,6 @@ RUN apk add --update --no-cache --virtual .tmp-build-deps \
 RUN apk add --update --no-cache zlib libjpeg
 RUN apk add build-base python3-dev py-pip jpeg-dev zlib-dev
 RUN pip3 install --upgrade pip
-RUN pip3 uninstall psycopg2-binary psycopg2
 RUN pip3 install -r /requirements.txt
 RUN apk del .tmp-build-deps
 
