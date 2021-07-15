@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import django_heroku
 import os
+import cloudinary
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -42,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'core'
+    'core',
+    'cloudinary'
 ]
 
 MIDDLEWARE = [
@@ -141,6 +143,16 @@ EMAIL_RECEIVER = os.environ['EMAIL_RECEIVER']
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+
+# Cloudinary
+
+cloudinary.config(
+    cloud_name=os.environ['CLOUD_NAME'],
+    api_key=os.environ['API_KEY'],
+    api_secret=os.environ['API_SECRET'],
+    secure=True
+)
 
 
 django_heroku.settings(locals())

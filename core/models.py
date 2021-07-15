@@ -3,6 +3,7 @@ import os
 from django.db import models
 from django.core.mail import send_mail
 from backend.settings import EMAIL_HOST_USER, EMAIL_RECEIVER
+from cloudinary.models import CloudinaryField
 
 
 def technology_file_path(instance, file_name):
@@ -14,11 +15,7 @@ def technology_file_path(instance, file_name):
 
 class Technology(models.Model):
     name = models.CharField(max_length=50)
-    image = models.ImageField(
-        upload_to=technology_file_path,
-        null=True,
-        blank=True
-    )
+    image = CloudinaryField('image')
 
     def __str__(self):
         return self.name
