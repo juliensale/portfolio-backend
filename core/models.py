@@ -5,6 +5,10 @@ from django.core.mail import send_mail
 from backend.settings import EMAIL_HOST_USER, EMAIL_RECEIVER
 from cloudinary.models import CloudinaryField
 
+from django.dispatch import receiver
+from django.db.models.signals import pre_delete
+import cloudinary
+
 
 def technology_file_path(instance, file_name):
     """Generate file path for new technology image"""
@@ -19,6 +23,11 @@ class Technology(models.Model):
 
     def __str__(self):
         return self.name
+
+
+@receiver(pre_delete, sender=Technology)
+def photo_delete(sender, instance, **kwargs):
+    cloudinary.uploader.destroy(instance.image.public_id)
 
 
 class Skill(models.Model):
