@@ -47,7 +47,8 @@ class Technology(models.Model):
 
 @receiver(pre_delete, sender=Technology)
 def photo_delete(sender, instance, **kwargs):
-    cloudinary.uploader.destroy(instance.image.public_id)
+    if instance.image:
+        cloudinary.uploader.destroy(instance.image.public_id)
 
 
 class Skill(models.Model):
