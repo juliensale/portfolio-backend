@@ -17,6 +17,26 @@ def technology_file_path(instance, file_name):
     return os.path.join('uploads/technology/', file_name)
 
 
+def check_translated_field(field, error_message=''):
+
+    try:
+        if field['en'] and field['fr']:
+            if len(field) != 2:
+                raise ValueError(error_message + " Found an extra field.")
+            else:
+                if (not isinstance(field['en'], str)
+                        or not isinstance(field['fr'], str)):
+                    raise ValueError(
+                        "'en' and 'fr' keys must be of type str."
+                    )
+        else:
+            raise ValueError(error_message)
+    except KeyError:
+        raise ValueError(error_message)
+    except TypeError:
+        raise ValueError(error_message)
+
+
 class Technology(models.Model):
     name = models.CharField(max_length=50)
     image = CloudinaryField('image')
@@ -47,43 +67,12 @@ class Skill(models.Model):
         # Name field
         error_name = ('Skill object name must be an'
                       + ' object with only the "en" and "fr" keys.')
-        try:
-            if self.name['en'] and self.name['fr']:
-                if len(self.name) != 2:
-                    raise ValueError(error_name + " Found an extra field.")
-                else:
-                    if (not isinstance(self.name['en'], str)
-                            or not isinstance(self.name['fr'], str)):
-                        raise ValueError(
-                            "'en' and 'fr' keys must be of type str."
-                        )
-            else:
-                raise ValueError(error_name)
-        except KeyError:
-            raise ValueError(error_name)
-        except TypeError:
-            raise ValueError(error_name)
+        check_translated_field(self.name, error_name)
 
         # Description field
         error_description = ('Skill object description must be an'
                              + ' object with only the "en" and "fr" keys.')
-        try:
-            if self.description['en'] and self.description['fr']:
-                if len(self.description) != 2:
-                    raise ValueError(error_description +
-                                     " Found an extra field.")
-                else:
-                    if (not isinstance(self.description['en'], str)
-                            or not isinstance(self.description['fr'], str)):
-                        raise ValueError(
-                            "'en' and 'fr' keys must be of type str."
-                        )
-            else:
-                raise ValueError(error_description)
-        except KeyError:
-            raise ValueError(error_description)
-        except TypeError:
-            raise ValueError(error_description)
+        check_translated_field(self.description, error_description)
 
         # Date field
         if not isinstance(self.date, list):
@@ -102,33 +91,47 @@ class Skill(models.Model):
         super(Skill, self).save(*args, **kwargs)
 
 
+class Project(models.Model):
+    name = models.JSONField()
+    description = models.JSONField()
+    image = CloudinaryField('image')
+    github = models.URLField(null=True, blank=True)
+    link = models.URLField(null=True, blank=True)
+    client = models.CharField(max_length=100, blank=True)
+    duration = models.IntegerField(null=True, blank=True)
+    technologies = models.ManyToManyField(Technology)
+
+    def __str__(self):
+        return self.name['en']
+
+    def save(self, *args, **kwargs):
+        is_creating = self.pk is None
+        super(Project, self).save(*args, **kwargs)
+        if is_creating:
+            Review.objects.create(
+                author=self.client,
+                message={"en": "a", "fr": "a"},
+                project=self
+            )
+        check_translated_field(self.name, "Project name error: wrong typing.")
+        check_translated_field(
+            self.description, "Project description error: wrong typing.")
+
+
 class Review(models.Model):
     author = models.CharField(max_length=50)
     message = models.JSONField()
     update_code = models.CharField(max_length=50, blank=True)
     modified = models.BooleanField(default=False)
+    project = models.OneToOneField(
+        Project, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.message['en']
 
     def save(self, *args, **kwargs):
-        error_message = ("Fail")
-        try:
-            if self.message['en'] and self.message['fr']:
-                if len(self.message) != 2:
-                    raise ValueError(error_message + " Found an extra field.")
-                else:
-                    if (not isinstance(self.message['en'], str)
-                            or not isinstance(self.message['fr'], str)):
-                        raise ValueError(
-                            "'en' and 'fr' keys must be of type str."
-                        )
-            else:
-                raise ValueError(error_message)
-        except KeyError:
-            raise ValueError(error_message)
-        except TypeError:
-            raise ValueError(error_message)
+        error_message = ("Review object: wrong message type.")
+        check_translated_field(self.message, error_message)
 
         if self.pk is None:
             self.update_code = str(uuid.uuid4())

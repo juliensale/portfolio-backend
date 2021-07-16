@@ -332,3 +332,107 @@ class ReviewModelTests(TestCase):
 
     def test_review_str(self):
         self.assertEqual(str(self.review), self.review.message['en'])
+
+
+class ProjectModelTests(TestCase):
+
+    def setUp(self):
+        self.project = models.Project.objects.create(
+            name={"en": "en", "fr": "fr"},
+            description={"en": "en description", "fr": "fr description"}
+        )
+
+    def test_project_str(self):
+        self.assertEqual(str(self.project), self.project.name['en'])
+
+    def test_project_creates_review(self):
+        """Tests that creating a project automatically
+        creates an associated review"""
+
+        exists = models.Review.objects.filter(project=self.project).exists()
+        self.assertTrue(exists)
+
+    def test_name_missing_language(self):
+        """Test that fails if name.en or name.fr is missing"""
+        with self.assertRaises(ValueError):
+            models.Project.objects.create(
+                name={"en": "azer"},
+                description={"en": "Test desc", "fr": "Test desc"}
+            )
+        with self.assertRaises(ValueError):
+            models.Project.objects.create(
+                name={"fr": "azer"},
+                description={"en": "Test desc", "fr": "Test desc"}
+            )
+
+    def test_name_non_object(self):
+        """Test giving anything else than an object for the name fails"""
+        with self.assertRaises(ValueError):
+            models.Project.objects.create(
+                name=[1, 2, 3],
+                description={"en": "Test desc", "fr": "Test desc"}
+            )
+
+    def test_name_extra_key(self):
+        """Test giving an extra key to name fails"""
+        with self.assertRaises(ValueError):
+            models.Project.objects.create(
+                name={"en": "aze", "fr": "azer", "extra": "azer"},
+                description={"en": "Test desc", "fr": "Test desc"}
+            )
+
+    def test_name_str(self):
+        """Test that the language keys must be strings"""
+        with self.assertRaises(ValueError):
+            models.Project.objects.create(
+                name={"en": [1, 2, 3], "fr": "azer"},
+                description={"en": "Test desc", "fr": "Test desc"}
+            )
+        with self.assertRaises(ValueError):
+            models.Project.objects.create(
+                name={"en": "aze", "fr": [1, 2, 3]},
+                description={"en": "Test desc", "fr": "Test desc"}
+            )
+
+    def test_description_missing_language(self):
+        """Test that fails if description.en or description.fr is missing"""
+        with self.assertRaises(ValueError):
+            models.Project.objects.create(
+                name={"en": "azer", "fr": "azer"},
+                description={"en": "Test desc"}
+            )
+        with self.assertRaises(ValueError):
+            models.Project.objects.create(
+                name={"en": "azer", "fr": "azer"},
+                description={"fr": "Test desc"}
+            )
+
+    def test_description_non_object(self):
+        """Test giving anything else than an object
+        for the description fails"""
+        with self.assertRaises(ValueError):
+            models.Project.objects.create(
+                name={"en": "azer", "fr": "azer"},
+                description=[1, 2, 3]
+            )
+
+    def test_description_extra_key(self):
+        """Test giving an extra key to description fails"""
+        with self.assertRaises(ValueError):
+            models.Project.objects.create(
+                name={"en": "azer", "fr": "azer"},
+                description={"en": "azer", "fr": "aezr", "extra": "azer"}
+            )
+
+    def test_description_str(self):
+        """Test that the language keys must be strings"""
+        with self.assertRaises(ValueError):
+            models.Project.objects.create(
+                name={"en": "azer", "fr": "azer"},
+                description={"en": "azer", "fr": [1, 2, 3]}
+            )
+        with self.assertRaises(ValueError):
+            models.Project.objects.create(
+                name={"en": "azer", "fr": "azer"},
+                description={"en": [1, 2, 3], "fr": "azer"}
+            )
