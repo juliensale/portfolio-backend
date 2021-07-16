@@ -1,7 +1,9 @@
 import os
-from rest.serializers import TechnologySerializer
-from core.models import Technology
-from rest_framework import viewsets, mixins
+
+from rest_framework.response import Response
+from rest.serializers import SkillSerializer, TechnologySerializer
+from core.models import Skill, Technology
+from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import BasePermission
 from rest_framework.authentication import get_authorization_header
 
@@ -40,3 +42,33 @@ class TechnologyItemViewSet(viewsets.GenericViewSet,
 
     def get_queryset(self):
         return self.queryset.order_by('name')
+
+
+class SkillItemViewSet(viewsets.GenericViewSet,
+                       mixins.ListModelMixin,
+                       mixins.CreateModelMixin,
+                       mixins.UpdateModelMixin,
+                       mixins.DestroyModelMixin):
+    permission_classes = (IsAdminOrIsGet,)
+    queryset = Skill.objects.all()
+    serializer_class = SkillSerializer
+
+    def get_queryset(self):
+        return self.queryset.order_by('name')
+
+    def create(self, request, *args, **kwargs):
+        try:
+            returnValue = super(SkillItemViewSet, self).create(
+                request, *args, **kwargs)
+        except ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return returnValue
+
+    def update(self, request, *args, **kwargs):
+        try:
+
+            returnValue = super(SkillItemViewSet, self).update(
+                request, *args, **kwargs)
+        except ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return returnValue
