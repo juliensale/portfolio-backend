@@ -1,5 +1,4 @@
 import uuid
-import os
 from django.db import models
 from django.core.mail import send_mail
 from backend.settings import EMAIL_HOST_USER, EMAIL_RECEIVER
@@ -8,13 +7,6 @@ from cloudinary.models import CloudinaryField
 from django.dispatch import receiver
 from django.db.models.signals import pre_delete
 import cloudinary
-
-
-def technology_file_path(instance, file_name):
-    """Generate file path for new technology image"""
-    ext = file_name.split('.')[-1]
-    file_name = f'{uuid.uuid4()}.{ext}'
-    return os.path.join('uploads/technology/', file_name)
 
 
 def check_translated_field(field, error_message=''):
@@ -46,7 +38,7 @@ class Technology(models.Model):
 
 
 @receiver(pre_delete, sender=Technology)
-def photo_delete(sender, instance, **kwargs):
+def technology_photo_delete(sender, instance, **kwargs):
     if instance.image:
         cloudinary.uploader.destroy(instance.image.public_id)
 
@@ -117,6 +109,12 @@ class Project(models.Model):
         check_translated_field(self.name, "Project name error: wrong typing.")
         check_translated_field(
             self.description, "Project description error: wrong typing.")
+
+
+@receiver(pre_delete, sender=Project)
+def project_photo_delete(sender, instance, **kwargs):
+    if instance.image:
+        cloudinary.uploader.destroy(instance.image.public_id)
 
 
 class Review(models.Model):
