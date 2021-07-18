@@ -173,32 +173,35 @@ class ProjectImageApiTests(TestCase):
         self.admin_client = APIClient()
         self.admin_client.credentials(
             HTTP_AUTHORIZATION='Token ' + os.environ['ADMIN_TOKEN'])
-        self.project = Project.objects.create(
-            name={"en": "Test project", "fr": "Projet test"},
-            description={"en": "Test desc", "fr": "Desc test"}
-        )
-
-    def tearDown(self):
-        self.project.delete()
 
     def test_publish_image_admin_only(self):
         """Test that publishing an image requires admin rights"""
         with NamedTemporaryFile(suffix=".jpeg") as ntf:
+            project = Project.objects.create(
+                name={"en": "Test project", "fr": "Projet test"},
+                description={"en": "Test desc", "fr": "Desc test"}
+            )
             img = Image.new('RGB', (10, 10))
             img.save(ntf, format="JPEG")
             ntf.seek(0)
             detail_url = reverse('rest:project-upload-image',
-                                 kwargs={'pk': self.project.id})
+                                 kwargs={'pk': project.id})
             res = self.client.post(detail_url, {"image": ntf})
             self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_publish_image(self):
         """Test publishing an image to a project"""
         with NamedTemporaryFile(suffix=".jpeg") as ntf:
+            project = Project.objects.create(
+                name={"en": "Test project", "fr": "Projet test"},
+                description={"en": "Test desc", "fr": "Desc test"}
+            )
             img = Image.new('RGB', (10, 10))
             img.save(ntf, format="JPEG")
             ntf.seek(0)
             detail_url = reverse('rest:project-upload-image',
-                                 kwargs={'pk': self.project.id})
+                                 kwargs={'pk': project.id})
             res = self.admin_client.post(detail_url, {"image": ntf})
             self.assertEqual(res.status_code, status.HTTP_200_OK)
+            project.refresh_from_db()
+            project.delete()
