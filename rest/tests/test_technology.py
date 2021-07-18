@@ -57,6 +57,8 @@ class TechnologyApiTests(TestCase):
             exists = Technology.objects.all().filter(
                 name=payload['name']).exists()
             self.assertTrue(exists)
+            Technology.objects.all().filter(
+                name=payload['name'])[0].delete()
 
     def test_create_wrong_credentials(self):
         """Test creating a technology with wrong credentials fails"""
