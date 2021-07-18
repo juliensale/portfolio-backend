@@ -38,11 +38,48 @@ class ProjectApiTests(TestCase):
         self.assertEqual(len(res.data), 2)
         self.assertEqual(res.data[0]['name'], serializer.data[0]['name'])
 
-    # def test_list_fields(self):
-    #     """Test that only some fields are visible in the list view"""
+    def test_list_fields(self):
+        """Test that only some fields are visible in the list view"""
+        Project.objects.create(
+            name={"en": "Test project", "fr": "Projet test"},
+            description={"en": "Test desc", "fr": "Desc test"}
+        )
 
-    # def test_detail_fields(self):
-    #     """Test that all the fields are visibile in the details view"""
+        res = self.client.get(PROJECT_URL)
+
+        has_good_attributes = ('id' in res.data[0]
+                               and 'name' in res.data[0]
+                               and 'description' in res.data[0]
+                               and 'image' in res.data[0]
+                               and 'technologies' in res.data[0]
+                               and 'github' not in res.data[0]
+                               and 'link' not in res.data[0]
+                               and 'client' not in res.data[0]
+                               and 'duration' not in res.data[0]
+                               )
+        self.assertTrue(has_good_attributes)
+
+    def test_detail_fields(self):
+        """Test that all the fields are visibile in the details view"""
+        project = Project.objects.create(
+            name={"en": "Test project", "fr": "Projet test"},
+            description={"en": "Test desc", "fr": "Desc test"}
+        )
+
+        detail_url = reverse('rest:project-detail', kwargs={"pk": project.id})
+        res = self.client.get(detail_url)
+
+        has_good_attributes = ('id' in res.data
+                               and 'name' in res.data
+                               and 'description' in res.data
+                               and 'image' in res.data
+                               and 'technologies' in res.data
+                               and 'github' in res.data
+                               and 'link' in res.data
+                               and 'client' in res.data
+                               and 'duration' in res.data
+                               )
+        self.assertTrue(has_good_attributes)
 
     def test_create_admin_only(self):
         """Tests that the creation requires admin rights"""

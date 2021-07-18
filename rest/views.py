@@ -1,8 +1,8 @@
 import os
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest.serializers import ProjectImageSerializer, ProjectSerializer,\
-    TechnologySerializer,  SkillSerializer
+from rest.serializers import LightProjectSerializer, ProjectImageSerializer,\
+    ProjectSerializer, TechnologySerializer,  SkillSerializer
 from core.models import Project, Skill, Technology
 from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import BasePermission
@@ -76,6 +76,7 @@ class SkillItemViewSet(viewsets.GenericViewSet,
 
 class ProjectItemViewSet(viewsets.GenericViewSet,
                          mixins.ListModelMixin,
+                         mixins.RetrieveModelMixin,
                          mixins.CreateModelMixin,
                          mixins.UpdateModelMixin,
                          mixins.DestroyModelMixin):
@@ -106,6 +107,8 @@ class ProjectItemViewSet(viewsets.GenericViewSet,
         """Returns the appropriate serializer class"""
         if self.action == 'upload_image':
             return ProjectImageSerializer
+        elif self.action == 'list':
+            return LightProjectSerializer
         return self.serializer_class
 
     @action(

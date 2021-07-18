@@ -16,6 +16,13 @@ class SkillSerializer(serializers.ModelSerializer):
         fields = ('id', 'date',  'name', 'description', 'technology')
 
 
+class LightProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ('id', 'name', 'description', 'image', 'technologies')
+        read_only_fields = ('id', 'image')
+
+
 class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
