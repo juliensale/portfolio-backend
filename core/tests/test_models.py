@@ -268,50 +268,8 @@ class ReviewModelTests(TestCase):
     def setUp(self):
         self.review = models.Review.objects.create(
             author="Test author",
-            message={"en": "Test message", "fr": "Message de test"}
+            message="Test message"
         )
-
-    def test_message_missing_language(self):
-        """Test that fails if message.en or message.fr is missing"""
-        with self.assertRaises(ValueError):
-            models.Review.objects.create(
-                author="Test author",
-                message={"en": "Test message"}
-            )
-        with self.assertRaises(ValueError):
-            models.Review.objects.create(
-                author="Test author",
-                message={"fr": "Message de test"}
-            )
-
-    def test_message_non_object(self):
-        """Test giving anything else than an object for the message fails"""
-        with self.assertRaises(ValueError):
-            models.Review.objects.create(
-                author="Test author",
-                message=[1, 2, 3]
-            )
-
-    def test_message_extra_key(self):
-        """Test giving an extra key to message fails"""
-        with self.assertRaises(ValueError):
-            models.Review.objects.create(
-                author="Test author",
-                message={"en": "Test message",
-                         "fr": "Message de test", "extra": "wrong"}
-            )
-
-    def test_message_str(self):
-        with self.assertRaises(ValueError):
-            models.Review.objects.create(
-                author="Test author",
-                message={"en": 3, "fr": "Message de test"}
-            )
-        with self.assertRaises(ValueError):
-            models.Review.objects.create(
-                author="Test author",
-                message={"en": "Test message", "fr": [1, 2, 3]}
-            )
 
     def test_update_code_generation(self):
         """Test that update_code is generated when
@@ -331,7 +289,7 @@ class ReviewModelTests(TestCase):
         self.assertTrue(self.review.modified)
 
     def test_review_str(self):
-        self.assertEqual(str(self.review), self.review.message['en'])
+        self.assertEqual(str(self.review), self.review.message)
 
 
 class ProjectModelTests(TestCase):

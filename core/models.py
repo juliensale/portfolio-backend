@@ -111,7 +111,7 @@ class Project(models.Model):
         if is_creating:
             Review.objects.create(
                 author=self.client,
-                message={"en": "a", "fr": "a"},
+                message="",
                 project=self
             )
         check_translated_field(self.name, "Project name error: wrong typing.")
@@ -126,20 +126,17 @@ def project_photo_delete(sender, instance, **kwargs):
 
 
 class Review(models.Model):
-    author = models.CharField(max_length=50)
-    message = models.JSONField()
+    author = models.CharField(max_length=50, blank=True, default="")
+    message = models.TextField(blank=True, default="")
     update_code = models.CharField(max_length=50, blank=True)
     modified = models.BooleanField(default=False)
     project = models.OneToOneField(
         Project, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.message['en']
+        return self.message
 
     def save(self, *args, **kwargs):
-        error_message = ("Review object: wrong message type.")
-        check_translated_field(self.message, error_message)
-
         if self.pk is None:
             self.update_code = str(uuid.uuid4())
             send_mail(
