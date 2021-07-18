@@ -1,8 +1,9 @@
 import os
-
+from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest.serializers import SkillSerializer, TechnologySerializer
-from core.models import Skill, Technology
+from rest.serializers import ProjectImageSerializer, ProjectSerializer,\
+    TechnologySerializer,  SkillSerializer
+from core.models import Project, Skill, Technology
 from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import BasePermission
 from rest_framework.authentication import get_authorization_header
@@ -66,9 +67,67 @@ class SkillItemViewSet(viewsets.GenericViewSet,
 
     def update(self, request, *args, **kwargs):
         try:
-
             returnValue = super(SkillItemViewSet, self).update(
                 request, *args, **kwargs)
         except ValueError:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return returnValue
+
+
+class ProjectItemViewSet(viewsets.GenericViewSet,
+                         mixins.ListModelMixin,
+                         mixins.CreateModelMixin,
+                         mixins.UpdateModelMixin,
+                         mixins.DestroyModelMixin):
+    permission_classes = (IsAdminOrIsGet,)
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+
+    def get_queryset(self):
+        return self.queryset.order_by('name')
+
+    def create(self, request, *args, **kwargs):
+        try:
+            returnValue = super(ProjectItemViewSet, self).create(
+                request, *args, **kwargs)
+        except ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return returnValue
+
+    def update(self, request, *args, **kwargs):
+        try:
+            returnValue = super(ProjectItemViewSet, self).update(
+                request, *args, **kwargs)
+        except ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return returnValue
+
+    def get_serializer_class(self):
+        """Returns the appropriate serializer class"""
+        if self.action == 'upload_image':
+            return ProjectImageSerializer
+        return self.serializer_class
+
+    @action(
+        methods=['post'],
+        detail=True,
+        permission_classes=[IsAdminOrIsGet, ],
+        url_path='upload_image'
+    )
+    def upload_image(self, request, pk=None):
+        """Uploads an image to a project"""
+        drawing = self.get_object()
+        serializer = self.get_serializer(
+            drawing,
+            data=request.data
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                status=status.HTTP_200_OK,
+                data=serializer.data
+            )
+        return Response(
+            status=status.HTTP_400_BAD_REQUEST,
+            data=serializer.errors
+        )

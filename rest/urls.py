@@ -5,6 +5,7 @@ from rest import views
 router = DefaultRouter()
 router.register('technology', views.TechnologyItemViewSet)
 router.register('skill', views.SkillItemViewSet)
+router.register('project', views.ProjectItemViewSet)
 
 app_name = 'rest'
 urlpatterns = [

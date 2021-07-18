@@ -95,7 +95,7 @@ class Skill(models.Model):
 class Project(models.Model):
     name = models.JSONField()
     description = models.JSONField()
-    image = CloudinaryField('image')
+    image = CloudinaryField('image', blank=True, null=True)
     github = models.URLField(null=True, blank=True)
     link = models.URLField(null=True, blank=True)
     client = models.CharField(max_length=100, blank=True)
