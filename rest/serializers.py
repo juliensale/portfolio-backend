@@ -1,4 +1,4 @@
-from core.models import Project, Skill, Technology
+from core.models import Project, Review, Skill, Technology
 from rest_framework import serializers
 
 
@@ -45,3 +45,10 @@ class ProjectImageSerializer(serializers.ModelSerializer):
         model = Project
         fields = ('id', 'image')
         read_only_fields = ('id',)
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ('id', 'author', 'message', 'project', 'modified')
+        read_only_fields = ('id', 'project', 'update_code', 'modified')

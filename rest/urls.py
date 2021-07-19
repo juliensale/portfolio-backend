@@ -6,6 +6,7 @@ router = DefaultRouter()
 router.register('technology', views.TechnologyItemViewSet)
 router.register('skill', views.SkillItemViewSet)
 router.register('project', views.ProjectItemViewSet)
+router.register('review', views.ReviewItemViewSet)
 
 app_name = 'rest'
 urlpatterns = [

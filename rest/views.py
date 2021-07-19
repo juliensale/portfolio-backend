@@ -1,9 +1,10 @@
 import os
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest.serializers import LightProjectSerializer, ProjectImageSerializer,\
-    ProjectSerializer, TechnologySerializer,  SkillSerializer
-from core.models import Project, Skill, Technology
+    ProjectSerializer, ReviewSerializer, TechnologySerializer,  SkillSerializer
+from core.models import Project, Review, Skill, Technology
 from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import BasePermission
 from rest_framework.authentication import get_authorization_header
@@ -134,3 +135,66 @@ class ProjectItemViewSet(viewsets.GenericViewSet,
             status=status.HTTP_400_BAD_REQUEST,
             data=serializer.errors
         )
+
+
+class ReviewPermission(BasePermission):
+    """Permission that authorizes all GET methods and
+    requires the Admin Token for all other kind of method"""
+    keyword = 'Token'
+
+    def has_permission(self, request, view):
+        if request.method == "GET" or view.action == "update_with_code":
+            return True
+        auth = get_authorization_header(request).split()
+        if not auth or auth[0].lower() != self.keyword.lower().encode():
+            return False
+
+        if len(auth) == 1:
+            return False
+        elif len(auth) > 2:
+            return False
+        try:
+            token = auth[1].decode()
+            return token == os.environ['ADMIN_TOKEN']
+        except UnicodeError:
+            return False
+
+
+class ReviewItemViewSet(viewsets.GenericViewSet,
+                        mixins.ListModelMixin,
+                        mixins.CreateModelMixin,
+                        mixins.DestroyModelMixin):
+
+    permission_classes = (ReviewPermission,)
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        return self.queryset.order_by('author')
+
+    @action(
+        methods=['patch', 'put'],
+        detail=False,
+        url_path='update-with-code'
+    )
+    def update_with_code(self, request, *args, **kwargs):
+        try:
+            update_code = request.data['update_code']
+            if update_code is not None:
+                try:
+                    instance = Review.objects.all().get(
+                        update_code=update_code)
+                    partial = kwargs.pop('partial', False)
+                    serializer = self.get_serializer(
+                        instance, data=request.data, partial=partial)
+                    if serializer.is_valid():
+                        serializer.save()
+                        return Response(serializer.data)
+                    else:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                except ObjectDoesNotExist:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(status=status.HTTP_403_FORBIDDEN)
+        except KeyError:
+            return Response(status=status.HTTP_403_FORBIDDEN)
