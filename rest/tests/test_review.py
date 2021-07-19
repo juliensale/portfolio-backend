@@ -19,10 +19,13 @@ class ReviewApiTests(TestCase):
     def test_retrieve_reviews(self):
         """Tests retrieving reviews"""
         Review.objects.create(author="", message="")
-        Review.objects.create(author="Google CEO", message="Good, very gud!")
+        Review.objects.create(author="Google CEO",
+                              message="Good, very gud!", modified=True)
+        Review.objects.create(author="Google CEO",
+                              message="Good, very gud!", modified=True)
 
         res = self.client.get(REVIEW_URL)
-        reviews = Review.objects.all().order_by('author')
+        reviews = Review.objects.all().filter(modified=True).order_by('author')
         serializer = ReviewSerializer(reviews, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
