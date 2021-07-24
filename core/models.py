@@ -149,7 +149,7 @@ class Project(models.Model):
                 project=self
             )
         check_translated_field(self.name, "Project name error: wrong typing.")
-        check_translated_field(
+        check_translated_MDX_field(
             self.description, "Project description error: wrong typing.")
 
 

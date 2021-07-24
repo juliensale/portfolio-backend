@@ -23,11 +23,11 @@ class ProjectApiTests(TestCase):
         """Tests retrieving projects"""
         Project.objects.create(
             name={"en": "Test project 1", "fr": "Test project 1"},
-            description={"en": "Test desc", "fr": "Test desc"}
+            description={"en": ["Test desc"], "fr": ["Test desc"]}
         )
         Project.objects.create(
             name={"en": "Test project 2", "fr": "Test project 2"},
-            description={"en": "Test desc", "fr": "Test desc"}
+            description={"en": ["Test desc"], "fr": ["Test desc"]}
         )
 
         res = self.client.get(PROJECT_URL)
@@ -42,7 +42,7 @@ class ProjectApiTests(TestCase):
         """Test that only some fields are visible in the list view"""
         Project.objects.create(
             name={"en": "Test project", "fr": "Projet test"},
-            description={"en": "Test desc", "fr": "Desc test"}
+            description={"en": ["Test desc"], "fr": ["Test desc"]}
         )
 
         res = self.client.get(PROJECT_URL)
@@ -63,7 +63,7 @@ class ProjectApiTests(TestCase):
         """Test that all the fields are visibile in the details view"""
         project = Project.objects.create(
             name={"en": "Test project", "fr": "Projet test"},
-            description={"en": "Test desc", "fr": "Desc test"}
+            description={"en": ["Test desc"], "fr": ["Test desc"]}
         )
 
         detail_url = reverse('rest:project-detail', kwargs={"pk": project.id})
@@ -85,7 +85,7 @@ class ProjectApiTests(TestCase):
         """Tests that the creation requires admin rights"""
         payload = {
             "name": {"en": "Test project", "fr": "Projet test"},
-            "description": {"en": "Test desc", "fr": "Desc test"}
+            "description": {"en": ["Test desc"], "fr": ["Test desc"]}
         }
         res = self.client.post(PROJECT_URL, payload, format="json")
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
@@ -94,7 +94,7 @@ class ProjectApiTests(TestCase):
         """Tests creating a project"""
         payload = {
             "name": {"en": "Test project", "fr": "Projet test"},
-            "description": {"en": "Test desc", "fr": "Desc test"}
+            "description": {"en": ["Test desc"], "fr": ["Test desc"]}
         }
         res = self.admin_client.post(
             PROJECT_URL, payload, format="json")
@@ -108,7 +108,7 @@ class ProjectApiTests(TestCase):
         """Tests creating a project with wrong credentials fails"""
         payload = {
             "name": {"en": [1, 2, 3], "fr": "Projet test"},
-            "description": {"en": "Test desc", "fr": "Desc test"}
+            "description": {"en": ["Test desc"], "fr": ["Test desc"]}
         }
         res = self.admin_client.post(
             PROJECT_URL, payload, format="json")
@@ -118,7 +118,7 @@ class ProjectApiTests(TestCase):
         """Tests that the update requires admin rights"""
         project = Project.objects.create(
             name={"en": "Test project", "fr": "Projet test"},
-            description={"en": "Test desc", "fr": "Desc test"}
+            description={"en": ["Test desc"], "fr": ["Test desc"]}
         )
         payload = {"name": {"en": "New name", "fr": "Nouveau nom"}}
         detail_url = reverse('rest:project-detail', kwargs={'pk': project.id})
@@ -129,7 +129,7 @@ class ProjectApiTests(TestCase):
         """Tests updating a project"""
         project = Project.objects.create(
             name={"en": "Test project", "fr": "Projet test"},
-            description={"en": "Test desc", "fr": "Desc test"}
+            description={"en": ["Test desc"], "fr": ["Test desc"]}
         )
         payload = {"name": {"en": "New name", "fr": "Nouveau nom"}}
         detail_url = reverse('rest:project-detail', kwargs={'pk': project.id})
@@ -143,7 +143,7 @@ class ProjectApiTests(TestCase):
         name = {"en": "Test project", "fr": "Projet test"}
         project = Project.objects.create(
             name=name,
-            description={"en": "Test desc", "fr": "Desc test"}
+            description={"en": ["Test desc"], "fr": ["Test desc"]}
         )
         detail_url = reverse('rest:project-detail', kwargs={'pk': project.id})
         res = self.client.delete(detail_url)
@@ -156,7 +156,7 @@ class ProjectApiTests(TestCase):
         name = {"en": "Test project", "fr": "Projet test"}
         project = Project.objects.create(
             name=name,
-            description={"en": "Test desc", "fr": "Desc test"}
+            description={"en": ["Test desc"], "fr": ["Test desc"]}
         )
         detail_url = reverse('rest:project-detail', kwargs={'pk': project.id})
         res = self.admin_client.delete(detail_url)
@@ -179,7 +179,7 @@ class ProjectImageApiTests(TestCase):
         with NamedTemporaryFile(suffix=".jpeg") as ntf:
             project = Project.objects.create(
                 name={"en": "Test project", "fr": "Projet test"},
-                description={"en": "Test desc", "fr": "Desc test"}
+                description={"en": ["Test desc"], "fr": ["Test desc"]}
             )
             img = Image.new('RGB', (10, 10))
             img.save(ntf, format="JPEG")
@@ -194,7 +194,7 @@ class ProjectImageApiTests(TestCase):
         with NamedTemporaryFile(suffix=".jpeg") as ntf:
             project = Project.objects.create(
                 name={"en": "Test project", "fr": "Projet test"},
-                description={"en": "Test desc", "fr": "Desc test"}
+                description={"en": ["Test desc"], "fr": ["Test desc"]}
             )
             img = Image.new('RGB', (10, 10))
             img.save(ntf, format="JPEG")

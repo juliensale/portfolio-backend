@@ -151,17 +151,6 @@ class SkillModelTest(TestCase):
                 date=[6, 2021]
             )
 
-    def test_correct_description(self):
-        """Test creating a skill with a correct description"""
-        models.Skill.objects.create(
-            name={"en": "test", "fr": "test"},
-            description={
-                "en": ["I learned to use MDX"],
-                "fr": ["J'ai appris à utiliser MDX"]
-            },
-            date=[6, 2021]
-        )
-
     def test_date_array(self):
         """Test that fails if date not array"""
         with self.assertRaises(ValueError):
@@ -252,6 +241,17 @@ class SkillModelTest(TestCase):
     def test_skill_str(self):
         self.assertEqual(str(self.skill), self.skill.name['en'])
 
+    def test_skill_valid(self):
+        """Test creating a valid skill"""
+        models.Skill.objects.create(
+            name={"en": "test", "fr": "test"},
+            description={
+                "en": ["I learned to use MDX"],
+                "fr": ["J'ai appris à utiliser MDX"]
+            },
+            date=[6, 2021]
+        )
+
 
 class TechnologyModelTests(TestCase):
 
@@ -308,7 +308,7 @@ class ProjectModelTests(TestCase):
     def setUp(self):
         self.project = models.Project.objects.create(
             name={"en": "en", "fr": "fr"},
-            description={"en": "en description", "fr": "fr description"}
+            description={"en": ["en description"], "fr": ["fr description"]}
         )
 
     def test_project_str(self):
@@ -326,12 +326,14 @@ class ProjectModelTests(TestCase):
         with self.assertRaises(ValueError):
             models.Project.objects.create(
                 name={"en": "azer"},
-                description={"en": "Test desc", "fr": "Test desc"}
+                description={"en": ["en description"],
+                             "fr": ["fr description"]}
             )
         with self.assertRaises(ValueError):
             models.Project.objects.create(
                 name={"fr": "azer"},
-                description={"en": "Test desc", "fr": "Test desc"}
+                description={"en": ["en description"],
+                             "fr": ["fr description"]}
             )
 
     def test_name_non_object(self):
@@ -339,7 +341,8 @@ class ProjectModelTests(TestCase):
         with self.assertRaises(ValueError):
             models.Project.objects.create(
                 name=[1, 2, 3],
-                description={"en": "Test desc", "fr": "Test desc"}
+                description={"en": ["en description"],
+                             "fr": ["fr description"]}
             )
 
     def test_name_extra_key(self):
@@ -347,7 +350,8 @@ class ProjectModelTests(TestCase):
         with self.assertRaises(ValueError):
             models.Project.objects.create(
                 name={"en": "aze", "fr": "azer", "extra": "azer"},
-                description={"en": "Test desc", "fr": "Test desc"}
+                description={"en": ["en description"],
+                             "fr": ["fr description"]}
             )
 
     def test_name_str(self):
@@ -355,12 +359,14 @@ class ProjectModelTests(TestCase):
         with self.assertRaises(ValueError):
             models.Project.objects.create(
                 name={"en": [1, 2, 3], "fr": "azer"},
-                description={"en": "Test desc", "fr": "Test desc"}
+                description={"en": ["en description"],
+                             "fr": ["fr description"]}
             )
         with self.assertRaises(ValueError):
             models.Project.objects.create(
                 name={"en": "aze", "fr": [1, 2, 3]},
-                description={"en": "Test desc", "fr": "Test desc"}
+                description={"en": ["en description"],
+                             "fr": ["fr description"]}
             )
 
     def test_description_missing_language(self):
@@ -368,12 +374,12 @@ class ProjectModelTests(TestCase):
         with self.assertRaises(ValueError):
             models.Project.objects.create(
                 name={"en": "azer", "fr": "azer"},
-                description={"en": "Test desc"}
+                description={"en": ["Test desc"]}
             )
         with self.assertRaises(ValueError):
             models.Project.objects.create(
                 name={"en": "azer", "fr": "azer"},
-                description={"fr": "Test desc"}
+                description={"fr": ["Test desc"]}
             )
 
     def test_description_non_object(self):
@@ -390,18 +396,25 @@ class ProjectModelTests(TestCase):
         with self.assertRaises(ValueError):
             models.Project.objects.create(
                 name={"en": "azer", "fr": "azer"},
-                description={"en": "azer", "fr": "aezr", "extra": "azer"}
+                description={"en": ["azer"], "fr": ["aezr"], "extra": ["azer"]}
             )
 
-    def test_description_str(self):
-        """Test that the language keys must be strings"""
+    def test_description_str_array(self):
+        """Test that the language keys must be string arrays"""
         with self.assertRaises(ValueError):
             models.Project.objects.create(
                 name={"en": "azer", "fr": "azer"},
-                description={"en": "azer", "fr": [1, 2, 3]}
+                description={"en": ["azer"], "fr": [1, 2, 3]}
             )
         with self.assertRaises(ValueError):
             models.Project.objects.create(
                 name={"en": "azer", "fr": "azer"},
-                description={"en": [1, 2, 3], "fr": "azer"}
+                description={"en": "Test", "fr": ["azer"]}
             )
+
+    def test_create_valid(self):
+        """Test creating a valid project object"""
+        models.Project.objects.create(
+            name={"en": "Test en", "fr": "Test fr"},
+            description={"en": ["Test desc"], "fr": ["Desc test"]}
+        )
