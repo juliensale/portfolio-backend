@@ -27,8 +27,42 @@ def check_translated_field(field, error_message=''):
                 if (not isinstance(field['en'], str)
                         or not isinstance(field['fr'], str)):
                     raise ValueError(
-                        "'en' and 'fr' keys must be of type str."
+                        error_message + "'en' and 'fr' keys must"
+                        + " be of type str."
                     )
+        else:
+            raise ValueError(error_message)
+    except KeyError:
+        raise ValueError(error_message)
+    except TypeError:
+        raise ValueError(error_message)
+
+
+def check_translated_MDX_field(field, error_message=''):
+    try:
+        if field['en'] and field['fr']:
+            if len(field) != 2:
+                raise ValueError(error_message + " Found an extra field.")
+            else:
+                if (not isinstance(field['en'], list)
+                        or not isinstance(field['fr'], list)):
+                    raise ValueError(
+                        error_message + "'en' and 'fr' keys must"
+                        + " be of type list."
+                    )
+                else:
+                    for line in field['en']:
+                        if not isinstance(line, str):
+                            raise ValueError(
+                                error_message + "'en' key entries "
+                                + "must be strings"
+                            )
+                    for line in field['fr']:
+                        if not isinstance(line, str):
+                            raise ValueError(
+                                error_message + "'fr' key entries"
+                                + " must be strings"
+                            )
         else:
             raise ValueError(error_message)
     except KeyError:
@@ -73,7 +107,7 @@ class Skill(models.Model):
         # Description field
         error_description = ('Skill object description must be an'
                              + ' object with only the "en" and "fr" keys.')
-        check_translated_field(self.description, error_description)
+        check_translated_MDX_field(self.description, error_description)
 
         # Date field
         if not isinstance(self.date, list):

@@ -24,16 +24,16 @@ class SkillApiTests(TestCase):
             date=[2, 2022],
             name={"en": "Test skill 1", "fr": "Skill de test 1"},
             description={
-                "en": "Test desc",
-                "fr": "Desc test"
+                "en": ["Test desc"],
+                "fr": ["Desc test"]
             }
         )
         Skill.objects.create(
             date=[8, 2021],
             name={"en": "Test skill 2", "fr": "Skill de test 2"},
             description={
-                "en": "Test desc",
-                "fr": "Desc test"
+                "en": ["Test desc"],
+                "fr": ["Desc test"]
             }
         )
 
@@ -49,7 +49,10 @@ class SkillApiTests(TestCase):
         payload = {
             "date": [2, 2022],
             "name": {"en": "Test skill", "fr": "Skill de test"},
-            "description": {"en": "Test desc", "fr": "Desc test"}
+            "description": {
+                "en": ["Test desc"],
+                "fr": ["Desc test"]
+            }
         }
         res = self.client.post(SKILL_URL, payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
@@ -59,7 +62,10 @@ class SkillApiTests(TestCase):
         payload = {
             "date": [2, 2022],
             "name": {"en": "Test skill", "fr": "Skill de test"},
-            "description": {"en": "Test desc", "fr": "Desc test"}
+            "description": {
+                "en": ["Test desc"],
+                "fr": ["Desc test"]
+            }
         }
         res = self.admin_client.post(SKILL_URL, payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
@@ -71,7 +77,10 @@ class SkillApiTests(TestCase):
         payload = {
             "date": "22 august",
             "name": {"en": "Test skill", "fr": "Skill de test"},
-            "description": {"en": "Test desc", "fr": "Desc test"}
+            "description": {
+                "en": ["test desc"],
+                "fr": ["desc test"]
+            }
         }
         res = self.admin_client.post(SKILL_URL, payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -82,8 +91,8 @@ class SkillApiTests(TestCase):
             date=[2, 2022],
             name={"en": "Test skill", "fr": "Skill de test"},
             description={
-                "en": "Test desc",
-                "fr": "Desc test"
+                "en": ["test desc"],
+                "fr": ["desc test"]
             }
         )
 
@@ -98,8 +107,8 @@ class SkillApiTests(TestCase):
             date=[2, 2022],
             name={"en": "Test skill", "fr": "Skill de test"},
             description={
-                "en": "Test desc",
-                "fr": "Desc test"
+                "en": ["test desc"],
+                "fr": ["desc test"]
             }
         )
 
@@ -116,8 +125,8 @@ class SkillApiTests(TestCase):
             date=[2, 2022],
             name={"en": "Test skill", "fr": "Skill de test"},
             description={
-                "en": "Test desc",
-                "fr": "Desc test"
+                "en": ["test desc"],
+                "fr": ["desc test"]
             }
         )
 
@@ -134,8 +143,8 @@ class SkillApiTests(TestCase):
             date=[2, 2022],
             name={"en": "Test skill", "fr": "Skill de test"},
             description={
-                "en": "Test desc",
-                "fr": "Desc test"
+                "en": ["test desc"],
+                "fr": ["desc test"]
             }
         )
 
@@ -150,8 +159,8 @@ class SkillApiTests(TestCase):
             date=[2, 2022],
             name=name,
             description={
-                "en": "Test desc",
-                "fr": "Desc test"
+                "en": ["test desc"],
+                "fr": ["desc test"]
             }
         )
 

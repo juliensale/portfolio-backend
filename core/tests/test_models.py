@@ -9,8 +9,8 @@ class SkillModelTest(TestCase):
         self.skill = models.Skill.objects.create(
             name={'en': "MDX", 'fr': "MDX"},
             description={
-                "en": "I learned to use MDX",
-                "fr": "J'ai appris à utiliser MDX"
+                "en": ["I learned to use MDX"],
+                "fr": ["J'ai appris à utiliser MDX"]
             },
             date=[6, 2021]
         )
@@ -22,8 +22,8 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name=[1, 2, 3],
                 description={
-                    "en": "I learned to use MDX",
-                    "fr": "J'ai appris à utiliser MDX"
+                    "en": ["I learned to use MDX"],
+                    "fr": ["J'ai appris à utiliser MDX"]
                 },
                 date=[6, 2021]
             )
@@ -34,8 +34,8 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"fr": "test"},
                 description={
-                    "en": "I learned to use MDX",
-                    "fr": "J'ai appris à utiliser MDX"
+                    "en": ["I learned to use MDX"],
+                    "fr": ["J'ai appris à utiliser MDX"]
                 },
                 date=[6, 2021]
             )
@@ -46,8 +46,8 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"en": "test"},
                 description={
-                    "en": "I learned to use MDX",
-                    "fr": "J'ai appris à utiliser MDX"
+                    "en": ["I learned to use MDX"],
+                    "fr": ["J'ai appris à utiliser MDX"]
                 },
                 date=[6, 2021]
             )
@@ -58,8 +58,8 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"en": 3, "fr": "test"},
                 description={
-                    "en": "I learned to use MDX",
-                    "fr": "J'ai appris à utiliser MDX"
+                    "en": ["I learned to use MDX"],
+                    "fr": ["J'ai appris à utiliser MDX"]
                 },
                 date=[6, 2021]
             )
@@ -67,8 +67,8 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"en": "test", "fr": [1, 2]},
                 description={
-                    "en": "I learned to use MDX",
-                    "fr": "J'ai appris à utiliser MDX"
+                    "en": ["I learned to use MDX"],
+                    "fr": ["J'ai appris à utiliser MDX"]
                 },
                 date=[6, 2021]
             )
@@ -79,8 +79,8 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"en": "test", "fr": "test", "extra": "wrong"},
                 description={
-                    "en": "I learned to use MDX",
-                    "fr": "J'ai appris à utiliser MDX"
+                    "en": ["I learned to use MDX"],
+                    "fr": ["J'ai appris à utiliser MDX"]
                 },
                 date=[6, 2021]
             )
@@ -101,7 +101,7 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"en": "test", "fr": "test"},
                 description={
-                    "fr": "J'ai appris à utiliser MDX"
+                    "fr": ["J'ai appris à utiliser MDX"]
                 },
                 date=[6, 2021]
             )
@@ -112,19 +112,19 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"en": "test", "fr": "test"},
                 description={
-                    "en": "J'ai appris à utiliser MDX"
+                    "en": ["J'ai appris à utiliser MDX"]
                 },
                 date=[6, 2021]
             )
 
-    def test_description_strings(self):
-        """Test that description.en & description.fr must be strings"""
+    def test_description_string_arrays(self):
+        """Test that description.en & description.fr must be string arrays"""
         with self.assertRaises(ValueError):
             models.Skill.objects.create(
                 name={"en": "test", "fr": "test"},
                 description={
-                    "en": 3,
-                    "fr": "J'ai appris à utiliser MDX"
+                    "en": "Test",
+                    "fr": ["J'ai appris à utiliser MDX"]
                 },
                 date=[6, 2021]
             )
@@ -132,7 +132,7 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"en": "test", "fr": "test"},
                 description={
-                    "en": "I learned to use MDX",
+                    "en": ["I learned to use MDX"],
                     "fr": [1, 2, 3]
                 },
                 date=[6, 2021]
@@ -144,12 +144,23 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"en": "test", "fr": "test"},
                 description={
-                    "en": "I learned to use MDX",
-                    "fr": "J'ai appris à utiliser MDX",
-                    "extra": "wrong"
+                    "en": ["I learned to use MDX"],
+                    "fr": ["J'ai appris à utiliser MDX"],
+                    "extra": ["wrong"]
                 },
                 date=[6, 2021]
             )
+
+    def test_correct_description(self):
+        """Test creating a skill with a correct description"""
+        models.Skill.objects.create(
+            name={"en": "test", "fr": "test"},
+            description={
+                "en": ["I learned to use MDX"],
+                "fr": ["J'ai appris à utiliser MDX"]
+            },
+            date=[6, 2021]
+        )
 
     def test_date_array(self):
         """Test that fails if date not array"""
@@ -157,8 +168,8 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"en": "test", "fr": "test"},
                 description={
-                    "en": "I learned to use MDX",
-                    "fr": "J'ai appris à utiliser MDX",
+                    "en": ["I learned to use MDX"],
+                    "fr": ["J'ai appris à utiliser MDX"],
                 },
                 date={"a": "test"}
             )
@@ -169,8 +180,8 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"en": "test", "fr": "test"},
                 description={
-                    "en": "I learned to use MDX",
-                    "fr": "J'ai appris à utiliser MDX",
+                    "en": ["I learned to use MDX"],
+                    "fr": ["J'ai appris à utiliser MDX"],
                 },
                 date=[1, 2, 3]
             )
@@ -181,8 +192,8 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"en": "test", "fr": "test"},
                 description={
-                    "en": "I learned to use MDX",
-                    "fr": "J'ai appris à utiliser MDX",
+                    "en": ["I learned to use MDX"],
+                    "fr": ["J'ai appris à utiliser MDX"],
                 },
                 date=[0, 2021]
             )
@@ -190,8 +201,8 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"en": "test", "fr": "test"},
                 description={
-                    "en": "I learned to use MDX",
-                    "fr": "J'ai appris à utiliser MDX",
+                    "en": ["I learned to use MDX"],
+                    "fr": ["J'ai appris à utiliser MDX"],
                 },
                 date=[13, 2021]
             )
@@ -202,8 +213,8 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"en": "test", "fr": "test"},
                 description={
-                    "en": "I learned to use MDX",
-                    "fr": "J'ai appris à utiliser MDX",
+                    "en": ["I learned to use MDX"],
+                    "fr": ["J'ai appris à utiliser MDX"],
                 },
                 date=[1, 1999]
             )
@@ -211,8 +222,8 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"en": "test", "fr": "test"},
                 description={
-                    "en": "I learned to use MDX",
-                    "fr": "J'ai appris à utiliser MDX",
+                    "en": ["I learned to use MDX"],
+                    "fr": ["J'ai appris à utiliser MDX"],
                 },
                 date=[1, 2101]
             )
@@ -223,8 +234,8 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"en": "test", "fr": "test"},
                 description={
-                    "en": "test",
-                    "fr": "J'ai appris à utiliser MDX"
+                    "en": ["I learned to use MDX"],
+                    "fr": ["J'ai appris à utiliser MDX"],
                 },
                 date=["a", 2021]
             )
@@ -232,8 +243,8 @@ class SkillModelTest(TestCase):
             models.Skill.objects.create(
                 name={"en": "test", "fr": "test"},
                 description={
-                    "en": "I learned to use MDX",
-                    "fr": "test"
+                    "en": ["I learned to use MDX"],
+                    "fr": ["J'ai appris à utiliser MDX"],
                 },
                 date=[6, [1, 2, 3]]
             )
