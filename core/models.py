@@ -134,7 +134,7 @@ class Project(models.Model):
     link = models.URLField(null=True, blank=True)
     client = models.CharField(max_length=100, blank=True)
     duration = models.IntegerField(null=True, blank=True)
-    technologies = models.ManyToManyField(Technology)
+    technologies = models.ManyToManyField(Technology, blank=True)
 
     def __str__(self):
         return self.name['en']
