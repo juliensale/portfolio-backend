@@ -140,6 +140,9 @@ class Project(models.Model):
         return self.name['en']
 
     def save(self, *args, **kwargs):
+        check_translated_field(self.name, "Project name error: wrong typing.")
+        check_translated_MDX_field(
+            self.description, "Project description error: wrong typing.")
         is_creating = self.pk is None
         super(Project, self).save(*args, **kwargs)
         if is_creating:
@@ -148,9 +151,6 @@ class Project(models.Model):
                 message="",
                 project=self
             )
-        check_translated_field(self.name, "Project name error: wrong typing.")
-        check_translated_MDX_field(
-            self.description, "Project description error: wrong typing.")
 
 
 @receiver(pre_delete, sender=Project)
