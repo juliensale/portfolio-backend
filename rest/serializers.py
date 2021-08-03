@@ -17,17 +17,20 @@ class SkillSerializer(serializers.ModelSerializer):
 
 
 class LightProjectSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField()
+    image = serializers.ImageField(allow_empty_file=True, required=False)
 
     class Meta:
         model = Project
         fields = ('id', 'name', 'description', 'image', 'technologies')
         read_only_fields = ('id', 'image')
+        extra_kwargs = {
+            'image': {'required': False}
+        }
 
 
 class ProjectSerializer(serializers.ModelSerializer):
 
-    image = serializers.ImageField()
+    image = serializers.ImageField(allow_empty_file=True, required=False)
 
     class Meta:
         model = Project
@@ -38,7 +41,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             'client': {'required': False},
             'link': {'required': False},
             'duration': {'required': False},
-            'technologies': {'required': False}
+            'technologies': {'required': False},
         }
 
 
