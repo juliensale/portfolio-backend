@@ -17,6 +17,8 @@ class SkillSerializer(serializers.ModelSerializer):
 
 
 class LightProjectSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField()
+
     class Meta:
         model = Project
         fields = ('id', 'name', 'description', 'image', 'technologies')
@@ -24,6 +26,8 @@ class LightProjectSerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(serializers.ModelSerializer):
+
+    image = serializers.ImageField()
 
     class Meta:
         model = Project
