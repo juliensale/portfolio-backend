@@ -120,13 +120,34 @@ class ProjectItemViewSet(viewsets.GenericViewSet,
     )
     def upload_image(self, request, pk=None):
         """Uploads an image to a project"""
-        drawing = self.get_object()
+        project = self.get_object()
         serializer = self.get_serializer(
-            drawing,
+            project,
             data=request.data
         )
         if serializer.is_valid():
             serializer.save()
+            return Response(
+                status=status.HTTP_200_OK,
+                data=serializer.data
+            )
+        return Response(
+            status=status.HTTP_400_BAD_REQUEST,
+            data=serializer.errors
+        )
+
+    @action(
+        methods=['get'],
+        detail=True,
+        permission_classes=[IsAdminOrIsGet, ],
+        url_path="review"
+    )
+    def review(self, request, pk=None):
+        """Retrieves the associated review"""
+        project = self.get_object()
+        associated_review = Review.objects.all().filter(project=project.id)[0]
+        serializer = ReviewSerializer(associated_review, data=request.data)
+        if serializer.is_valid():
             return Response(
                 status=status.HTTP_200_OK,
                 data=serializer.data

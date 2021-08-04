@@ -2,8 +2,8 @@ import os
 from PIL import Image
 from tempfile import NamedTemporaryFile
 from django.test import TestCase
-from core.models import Project
-from rest.serializers import ProjectSerializer
+from core.models import Project, Review
+from rest.serializers import ProjectSerializer, ReviewSerializer
 from rest_framework import status
 from rest_framework.test import APIClient
 from django.urls import reverse
@@ -163,6 +163,20 @@ class ProjectApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         exists = Project.objects.all().filter(name=name).exists()
         self.assertFalse(exists)
+
+    def test_get_project_review(self):
+        """Test getting the review associated to a project"""
+        project = Project.objects.create(
+            name={"en": "Test project", "fr": "Projet test"},
+            description={"en": ["test"], "fr": ["test"]}
+        )
+        associated_review = Review.objects.all().filter(project=project.id)[0]
+
+        url = reverse('rest:project-review', kwargs={'pk': project.id})
+        res = self.client.get(url)
+        serializer = ReviewSerializer(associated_review)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
 
 
 class ProjectImageApiTests(TestCase):
