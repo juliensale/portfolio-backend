@@ -108,3 +108,20 @@ class ReviewApiTests(TestCase):
         detail_url = reverse('rest:review-detail', kwargs={'pk': review.id})
         res = self.admin_client.delete(detail_url)
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_get_all_reviews(self):
+        """Tests the get-all api"""
+        Review.objects.create(author="", message="")
+        Review.objects.create(author="Google CEO",
+                              message="Good, very gud!", modified=True)
+        Review.objects.create(author="Google CEO",
+                              message="Good, very gud!", modified=True)
+
+        url = reverse('rest:review-get-all')
+        res = self.client.get(url)
+        reviews = Review.objects.all().order_by('author')
+        serializer = ReviewSerializer(reviews, many=True)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 3)
+        self.assertEqual(res.data[0]['author'], serializer.data[0]['author'])

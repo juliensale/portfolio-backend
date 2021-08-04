@@ -228,3 +228,13 @@ class ReviewItemViewSet(viewsets.GenericViewSet,
                 return Response(status=status.HTTP_403_FORBIDDEN)
         except KeyError:
             return Response(status=status.HTTP_403_FORBIDDEN)
+
+    @action(
+        methods=['get'],
+        detail=False,
+        url_path="get-all"
+    )
+    def get_all(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
