@@ -54,6 +54,15 @@ class ProjectImageSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
 
+class ReviewAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ('id', 'author', 'message',
+                  'project', 'modified', 'update_code')
+        read_only_fields = ('id', 'project', 'update_code',
+                            'modified', 'update_code')
+
+
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review

@@ -189,3 +189,18 @@ class ReviewApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 3)
         self.assertEqual(res.data[0]['author'], serializer.data[0]['author'])
+        self.assertNotIn('update_code', res.data[0])
+
+    def test_get_all_as_admin(self):
+        """Test the get-all API shows the update_codes to the admin"""
+        Review.objects.create(
+            author="Google CEO",
+            message={
+                "en": "Good, very gud!",
+                "fr": "Bien, très bien!"
+            }, modified=True
+        )
+        url = reverse('rest:review-get-all')
+        res = self.admin_client.get(url)
+
+        self.assertIn('update_code', res.data[0])

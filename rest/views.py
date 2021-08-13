@@ -3,7 +3,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest.serializers import LightProjectSerializer, ProjectImageSerializer,\
-    ProjectSerializer, ReviewSerializer, TechnologySerializer,  SkillSerializer
+    ProjectSerializer, ReviewAdminSerializer, ReviewSerializer,\
+    TechnologySerializer, SkillSerializer
 from core.models import Project, Review, Skill, Technology
 from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import BasePermission
@@ -180,6 +181,21 @@ class ReviewPermission(BasePermission):
         except UnicodeError:
             return False
 
+    def is_admin(self, request):
+        auth = get_authorization_header(request).split()
+        if not auth or auth[0].lower() != self.keyword.lower().encode():
+            return False
+
+        if len(auth) == 1:
+            return False
+        elif len(auth) > 2:
+            return False
+        try:
+            token = auth[1].decode()
+            return token == os.environ['ADMIN_TOKEN']
+        except UnicodeError:
+            return False
+
 
 class ReviewItemViewSet(viewsets.GenericViewSet,
                         mixins.ListModelMixin,
@@ -202,7 +218,14 @@ class ReviewItemViewSet(viewsets.GenericViewSet,
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(
+    def get_serializer_class(self):
+        """Returns the appropriate serializer class"""
+        if self.permission_classes[0]().is_admin(self.request):
+            return ReviewAdminSerializer
+        else:
+            return ReviewSerializer
+
+    @ action(
         methods=['get', 'patch', 'put'],
         detail=False,
         url_path='with-code'
