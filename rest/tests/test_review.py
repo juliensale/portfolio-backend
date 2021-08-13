@@ -18,11 +18,20 @@ class ReviewApiTests(TestCase):
 
     def test_retrieve_reviews(self):
         """Tests retrieving reviews"""
-        Review.objects.create(author="", message="")
+        Review.objects.create(author="", message={"en": "", "fr": ""})
         Review.objects.create(author="Google CEO",
-                              message="Good, very gud!", modified=True)
+                              message={
+                                  "en": "Good, very gud!",
+                                  "fr": "Bien, très bien!"
+                              },
+                              modified=True
+                              )
         Review.objects.create(author="Google CEO",
-                              message="Good, very gud!", modified=True)
+                              message={
+                                  "en": "Good, very gud!",
+                                  "fr": "Bien, très bien!"
+                              },
+                              modified=True)
 
         res = self.client.get(REVIEW_URL)
         reviews = Review.objects.all().filter(modified=True).order_by('author')
@@ -47,10 +56,10 @@ class ReviewApiTests(TestCase):
     def test_update_code_only(self):
         """Tests that the update requires the update_code"""
         review = Review.objects.create(
-            author="", message="")
+            author="", message={"en": "", "fr": ""})
         payload = {"author": "Google CEO", "message": "Good, very gud!"}
         update_url = reverse('rest:review-update-with-code')
-        res = self.client.patch(update_url, payload)
+        res = self.client.patch(update_url, payload, format="json")
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         review.refresh_from_db()
         self.assertNotEqual(review.author, payload['author'])
@@ -58,11 +67,15 @@ class ReviewApiTests(TestCase):
     def test_update_wrong_code(self):
         """Tests that updating with a wrong code fails correctly"""
         review = Review.objects.create(
-            author="", message="")
+            author="", message={"en": "", "fr": ""})
         payload = {"author": "Google CEO",
-                   "message": "Good, very gud!", "update_code": "30a"}
+                   "message": {
+                       "en": "Good, very gud!",
+                       "fr": "Bien, très bien!"
+                   },
+                   "update_code": "30a"}
         update_url = reverse('rest:review-update-with-code')
-        res = self.client.patch(update_url, payload)
+        res = self.client.patch(update_url, payload, format="json")
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
         review.refresh_from_db()
         self.assertNotEqual(review.author, payload['author'])
@@ -70,11 +83,15 @@ class ReviewApiTests(TestCase):
     def test_update_review(self):
         """Tests updating a review with its update code"""
         review = Review.objects.create(
-            author="", message="")
-        payload = {"author": "Google CEO", "message": "Good, very gud!",
+            author="", message={"en": "", "fr": ""})
+        payload = {"author": "Google CEO",
+                   "message": {
+                       "en": "Good, very gud!",
+                       "fr": "Bien, très bien!"
+                   },
                    "update_code": review.update_code}
         update_url = reverse('rest:review-update-with-code')
-        res = self.client.patch(update_url, payload)
+        res = self.client.patch(update_url, payload, format="json")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         review.refresh_from_db()
         self.assertEqual(review.author, payload['author'])
@@ -84,19 +101,29 @@ class ReviewApiTests(TestCase):
         """Tests updating a review with correct code but wrong credentials
         fails correctly"""
         review = Review.objects.create(
-            author="", message="")
-        payload = {"author": [1, 2, 3], "message": "Good, very gud!",
-                   "update_code": review.update_code}
+            author="", message={"en": "", "fr": ""})
+        payload = {
+            "author": [1, 2, 3],
+            "message": {
+                "en": "Good, very gud!",
+                "fr": "Bien, très bien!"
+            },
+            "update_code": review.update_code
+        }
         update_url = reverse('rest:review-update-with-code')
-        res = self.client.patch(update_url, payload)
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res = self.client.patch(update_url, payload, format="json")
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         review.refresh_from_db()
         self.assertNotEqual(review.author, payload['author'])
 
     def test_delete_admin_only(self):
         """Tests that the deletion requires admin rights"""
         review = Review.objects.create(
-            author="Google CEO", message="Good, very gud!")
+            author="Google CEO",
+            message={
+                "en": "Good, very gud!",
+                "fr": "Bien, très bien!"
+            })
         detail_url = reverse('rest:review-detail', kwargs={'pk': review.id})
         res = self.client.delete(detail_url)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
@@ -104,18 +131,33 @@ class ReviewApiTests(TestCase):
     def test_delete_review(self):
         """Test deleting a review"""
         review = Review.objects.create(
-            author="Google CEO", message="Good, very gud!")
+            author="Google CEO",
+            message={
+                "en": "Good, very gud!",
+                "fr": "Bien, très bien!"
+            })
         detail_url = reverse('rest:review-detail', kwargs={'pk': review.id})
         res = self.admin_client.delete(detail_url)
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_get_all_reviews(self):
         """Tests the get-all api"""
-        Review.objects.create(author="", message="")
-        Review.objects.create(author="Google CEO",
-                              message="Good, very gud!", modified=True)
-        Review.objects.create(author="Google CEO",
-                              message="Good, very gud!", modified=True)
+        Review.objects.create(author="", message={"en": "", "fr": ""})
+        Review.objects.create(
+            author="Google CEO",
+            message={
+                "en": "Good, very gud!",
+                "fr": "Bien, très bien!"
+            }, modified=True
+        )
+        Review.objects.create(
+            author="Google CEO",
+            message={
+                "en": "Good, very gud!",
+                "fr": "Bien, très bien!"
+            },
+            modified=True
+        )
 
         url = reverse('rest:review-get-all')
         res = self.client.get(url)
