@@ -17,10 +17,10 @@ def technology_file_path(instance, file_name):
     return os.path.join('uploads/technology/', file_name)
 
 
-def check_translated_field(field, error_message=''):
+def check_translated_field(field, error_message='', blank=False):
 
     try:
-        if field['en'] and field['fr']:
+        if blank or (field['en'] and field['fr']):
             if len(field) != 2:
                 raise ValueError(error_message + " Found an extra field.")
             else:
@@ -148,7 +148,7 @@ class Project(models.Model):
         if is_creating:
             Review.objects.create(
                 author=self.client,
-                message="",
+                message={"en": "", "fr": ""},
                 project=self
             )
 
@@ -161,16 +161,18 @@ def project_photo_delete(sender, instance, **kwargs):
 
 class Review(models.Model):
     author = models.CharField(max_length=50, blank=True, default="")
-    message = models.TextField(blank=True, default="")
+    message = models.JSONField(default={"en": "", "fr": ""})
     update_code = models.CharField(max_length=50, blank=True)
     modified = models.BooleanField(default=False)
     project = models.OneToOneField(
         Project, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.message
+        return self.message["en"]
 
     def save(self, *args, **kwargs):
+        check_translated_field(
+            self.message, "Review message error: wrong typing.", True)
         if self.pk is None:
             self.update_code = str(uuid.uuid4())
             send_mail(
