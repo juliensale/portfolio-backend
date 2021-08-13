@@ -164,7 +164,7 @@ class ReviewPermission(BasePermission):
     keyword = 'Token'
 
     def has_permission(self, request, view):
-        if request.method == "GET" or view.action == "update_with_code":
+        if request.method == "GET" or view.action == "with_code":
             return True
         auth = get_authorization_header(request).split()
         if not auth or auth[0].lower() != self.keyword.lower().encode():
@@ -203,31 +203,51 @@ class ReviewItemViewSet(viewsets.GenericViewSet,
         return Response(serializer.data)
 
     @action(
-        methods=['patch', 'put'],
+        methods=['get', 'patch', 'put'],
         detail=False,
-        url_path='update-with-code'
+        url_path='with-code'
     )
-    def update_with_code(self, request, *args, **kwargs):
-        try:
-            update_code = request.data['update_code']
-            if update_code is not None:
-                try:
-                    instance = Review.objects.all().get(
-                        update_code=update_code)
-                    partial = kwargs.pop('partial', False)
-                    serializer = self.get_serializer(
-                        instance, data=request.data, partial=partial)
-                    if serializer.is_valid():
-                        serializer.save()
-                        return Response(serializer.data)
-                    else:
-                        return Response(status=status.HTTP_400_BAD_REQUEST)
-                except ObjectDoesNotExist:
-                    return Response(status=status.HTTP_404_NOT_FOUND)
-            else:
+    def with_code(self, request, *args, **kwargs):
+        if request.method == 'GET':
+            try:
+                update_code = request.query_params.get('update_code')
+                instance = Review.objects.all().get(
+                    update_code=update_code
+                )
+                serializer = self.get_serializer(instance)
+                return Response(
+                    status=status.HTTP_200_OK,
+                    data=serializer.data
+                )
+
+            except KeyError:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            except ObjectDoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+        elif request.method == 'PATCH' or request.method == 'PUT':
+            try:
+                update_code = request.data['update_code']
+                if update_code is not None:
+                    try:
+                        instance = Review.objects.all().get(
+                            update_code=update_code)
+                        partial = kwargs.pop('partial', False)
+                        serializer = self.get_serializer(
+                            instance, data=request.data, partial=partial)
+                        if serializer.is_valid():
+                            serializer.save()
+                            return Response(serializer.data)
+                        else:
+                            return Response(status=status.HTTP_400_BAD_REQUEST)
+                    except ObjectDoesNotExist:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                else:
+                    return Response(status=status.HTTP_403_FORBIDDEN)
+            except KeyError:
                 return Response(status=status.HTTP_403_FORBIDDEN)
-        except KeyError:
-            return Response(status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(
         methods=['get'],

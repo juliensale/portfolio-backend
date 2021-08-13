@@ -53,16 +53,36 @@ class ReviewApiTests(TestCase):
         exists = Review.objects.all().filter(id=res.data['id']).exists()
         self.assertTrue(exists)
 
+    def test_get_without_code(self):
+        """Test GET method for with-code url without an update_code"""
+        res = self.client.get(reverse('rest:review-with-code'))
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_update_code_only(self):
         """Tests that the update requires the update_code"""
         review = Review.objects.create(
             author="", message={"en": "", "fr": ""})
         payload = {"author": "Google CEO", "message": "Good, very gud!"}
-        update_url = reverse('rest:review-update-with-code')
+        update_url = reverse('rest:review-with-code')
         res = self.client.patch(update_url, payload, format="json")
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         review.refresh_from_db()
         self.assertNotEqual(review.author, payload['author'])
+
+    def test_get_with_code(self):
+        """Tests the GET method for the with-code url"""
+        review = Review.objects.create(
+            author="Google CEO",
+            message={"en": "Test", "fr": "Test"}
+        )
+        detail_url = reverse('rest:review-with-code')
+        res = self.client.get(
+            detail_url,
+            {'update_code': review.update_code}
+        )
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data['author'], review.author)
 
     def test_update_wrong_code(self):
         """Tests that updating with a wrong code fails correctly"""
@@ -74,7 +94,7 @@ class ReviewApiTests(TestCase):
                        "fr": "Bien, très bien!"
                    },
                    "update_code": "30a"}
-        update_url = reverse('rest:review-update-with-code')
+        update_url = reverse('rest:review-with-code')
         res = self.client.patch(update_url, payload, format="json")
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
         review.refresh_from_db()
@@ -84,13 +104,15 @@ class ReviewApiTests(TestCase):
         """Tests updating a review with its update code"""
         review = Review.objects.create(
             author="", message={"en": "", "fr": ""})
-        payload = {"author": "Google CEO",
-                   "message": {
-                       "en": "Good, very gud!",
-                       "fr": "Bien, très bien!"
-                   },
-                   "update_code": review.update_code}
-        update_url = reverse('rest:review-update-with-code')
+        payload = {
+            "author": "Google CEO",
+            "message": {
+                "en": "Good, very gud!",
+                "fr": "Bien, très bien!"
+            },
+            "update_code": review.update_code
+        }
+        update_url = reverse('rest:review-with-code')
         res = self.client.patch(update_url, payload, format="json")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         review.refresh_from_db()
@@ -110,7 +132,7 @@ class ReviewApiTests(TestCase):
             },
             "update_code": review.update_code
         }
-        update_url = reverse('rest:review-update-with-code')
+        update_url = reverse('rest:review-with-code')
         res = self.client.patch(update_url, payload, format="json")
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         review.refresh_from_db()
