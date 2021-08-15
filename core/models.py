@@ -148,7 +148,7 @@ class Project(models.Model):
         if is_creating:
             Review.objects.create(
                 author=self.client,
-                message={"en": "", "fr": ""},
+                message=dict([("en", ""), ("fr", "")]),
                 project=self
             )
 
@@ -159,9 +159,13 @@ def project_photo_delete(sender, instance, **kwargs):
         cloudinary.uploader.destroy(instance.image.public_id)
 
 
+def default_dict():
+    return {"en": "", "fr": ""}
+
+
 class Review(models.Model):
     author = models.CharField(max_length=50, blank=True, default="")
-    message = models.JSONField(default={"en": "", "fr": ""})
+    message = models.JSONField(default=default_dict)
     update_code = models.CharField(max_length=50, blank=True)
     modified = models.BooleanField(default=False)
     project = models.OneToOneField(

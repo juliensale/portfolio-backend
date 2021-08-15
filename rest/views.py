@@ -225,7 +225,7 @@ class ReviewItemViewSet(viewsets.GenericViewSet,
         else:
             return ReviewSerializer
 
-    @ action(
+    @action(
         methods=['get', 'patch', 'put'],
         detail=False,
         url_path='with-code'
