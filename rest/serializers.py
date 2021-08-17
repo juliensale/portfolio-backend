@@ -2,6 +2,13 @@ from core.models import Project, Review, Skill, Technology
 from rest_framework import serializers
 
 
+class MailSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    name = serializers.CharField(max_length=200)
+    subject = serializers.CharField(max_length=1500)
+    message = serializers.CharField()
+
+
 class TechnologySerializer(serializers.ModelSerializer):
     image = serializers.ImageField()
 

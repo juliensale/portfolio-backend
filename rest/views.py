@@ -1,14 +1,37 @@
+from django.core.mail import send_mail
+from backend.settings import EMAIL_RECEIVER
 import os
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest.serializers import LightProjectSerializer, ProjectImageSerializer,\
-    ProjectSerializer, ReviewAdminSerializer, ReviewSerializer,\
-    TechnologySerializer, SkillSerializer
+from rest.serializers import LightProjectSerializer, MailSerializer,\
+    ProjectImageSerializer, ProjectSerializer, ReviewAdminSerializer,\
+    ReviewSerializer, TechnologySerializer, SkillSerializer
 from core.models import Project, Review, Skill, Technology
 from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import BasePermission
 from rest_framework.authentication import get_authorization_header
+from rest_framework.views import APIView
+
+
+class Contact(APIView):
+    serializer_class = MailSerializer
+
+    def post(self, request, format=None):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            message = "Name: " + \
+                serializer.data['name'] + "\n" + serializer.data['message']
+            send_mail(
+                serializer.data['subject'],
+                message,
+                serializer.data['email'],
+                [EMAIL_RECEIVER],
+                fail_silently=False
+            )
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class IsAdminOrIsGet(BasePermission):

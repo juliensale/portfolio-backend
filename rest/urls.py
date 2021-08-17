@@ -10,5 +10,6 @@ router.register('review', views.ReviewItemViewSet)
 
 app_name = 'rest'
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
+    path('mail/', views.Contact.as_view())
 ]
