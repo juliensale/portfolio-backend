@@ -1,8 +1,6 @@
 import uuid
 import os
 from django.db import models
-from django.core.mail import send_mail
-from backend.settings import EMAIL_HOST_USER, EMAIL_RECEIVER
 from cloudinary.models import CloudinaryField
 
 from django.dispatch import receiver
@@ -179,13 +177,6 @@ class Review(models.Model):
             self.message, "Review message error: wrong typing.", True)
         if self.pk is None:
             self.update_code = str(uuid.uuid4())
-            send_mail(
-                '[Portfolio]: New Review Code',
-                f'The code is: {self.update_code}',
-                EMAIL_HOST_USER,
-                (EMAIL_RECEIVER,),
-                fail_silently=False
-            )
         else:
             self.modified = True
         super(Review, self).save(*args, **kwargs)
